@@ -21,92 +21,112 @@
 
 module uart_rx
 #(
-    NB_DATA  = 8                                    ,
+    NB_DATA  = 8                                                    ,
     NB_STOP  = 16 //stops at 16 count
 )(
-    input   wire                    clk             ,
-    input   wire                    i_rst_n         ,
-    input   wire                    i_tick          ,
-    input   wire                    i_data          , //! i_rx
-    output  wire [NB_DATA - 1 : 0]  o_data          ,
+    input   wire                    clk                             ,
+    input   wire                    i_rst_n                         ,
+    input   wire                    i_tick                          ,
+    input   wire                    i_data                          , //! i_rx
+    output  wire [NB_DATA - 1 : 0]  o_data                          ,
     output  wire                    o_rxdone
 );
-    reg [clogb2(NB_STOP-1)-1:0]   tick_counter                ; //! tick counter
-    reg [clogb2(NB_STOP-1)-1:0]   next_tick_counter           ; //! next value of tick_counter
-    reg [3:0]                     state, next_state           ;
-    reg [clogb2(NB_DATA-1)-1:0]   recBits                     ; //! received bits
-    reg [clogb2(NB_DATA-1)-1:0]   next_recBits                ;
-    reg [NB_DATA-1:0]             recBytes                    ; //! received frame
-    reg [NB_DATA-1:0]             next_recBytes               ;
-    localparam [3:0] 
+
+
+    reg [clogb2(NB_STOP-1)-1:0]   tick_counter                      ; //! tick counter
+    reg [clogb2(NB_STOP-1)-1:0]   next_tick_counter                 ; //! next value of tick_counter
+    reg [3:0]                     state, next_state                 ;
+    reg [clogb2(NB_DATA-1)-1:0]   recBits                           ; //! received bits
+    reg [clogb2(NB_DATA-1)-1:0]   next_recBits                      ;
+    reg [NB_DATA-1:0]             recByte                           ; //! received frame
+    reg [NB_DATA-1:0]             next_recByte                      ;
+
+
+    localparam [3:0]    //! states
                     IDLE    = 0001,
                     START   = 0010,
                     RECEIVE = 0100,
-                    STOP    = 1000;
+                    STOP    = 1000; 
 
 
     always @(posedge clk or negedge i_rst_n) begin
         if(!i_rst_n) begin
-            state <= IDLE                           ;
-            tick_counter <= 0                       ;
-            recBits <= 0                            ;
-            recBytes <= 0                           ;
-        end else begin
-            state <= next_state                     ;
-            tick_counter <= next_tick_counter       ;
-            recBits <= next_recBits                 ;
-            recBytes <= next_recBytes               ;
+            state <= IDLE                                           ;
+            tick_counter <= 0                                       ;
+            recBits <= 0                                            ;
+            recBytes <= 0                                           ;
+        end else begin              
+            state <= next_state                                     ;
+            tick_counter <= next_tick_counter                       ;
+            recBits <= next_recBits                                 ;
+            recByte <= next_recByte                                 ;
 
         end
     end
-
-
-
 
     // state machine
     always @(*) begin
         case (state) 
             IDLE: begin
                 if(!i_data) begin
-                    next_state = START ;
-                    next_tick_counter = 0;
+                    next_state = START                              ;
+                    next_tick_counter = 0                           ;
                 end
             end
             START: begin
                 if(i_tick) begin
                     if(tick_counter == (NB_DATA-1)) begin
-                        next_state        = RECEIVE     ;
-                        next_tick_counter = 0           ;
-                        next_recBits      = 0           ;
+                        next_state        = RECEIVE                 ;
+                        next_tick_counter = 0                       ;
+                        next_recBits      = 0                       ;
                         
                     end else begin 
-                        next_tick_counter = tick_counter + 1 ;
+                        next_tick_counter = tick_counter + 1        ;
                     end
                 end
             end
             RECEIVE: begin
-                if(tick_counter == (NB_STOP-1)) begin 
-                    
+                if(i_tick) begin
+                    if(tick_counter == (NB_STOP-1)) begin 
+                        next_tick_counter = 0                       ;
+                        recByte = {i_data, recByte[NB_DATA-1:1]}    ; // shiftregister
+                            if(recBits == (NB_DATA -1)) begin 
+                                next_state = STOP                   ;
+                            end else begin 
+                                next_recBits = recBits + 1          ;
+                            end
+                    end else begin 
+                        next_tick_counter = tick_counter + 1        ;
+                    end
                 end
                 
             end
             STOP: begin
+                if(i_tick) begin
+                    if(tick_counter == (NB_STOP-1)) begin
+                        next_state = IDLE                           ;
+                        if(i_data) o_rxdone = 1                     ;
+                    end else begin
+                        next_tick_counter = tick_counter + 1        ;
+                    end
+                end
                 
             end
             default: begin 
-                next_state <= next_state                ;
-                next_recBits <= next_recBits            ;
-                next_recBytes <= next_recBytes          ;
-                next_tick_counter <= next_tick_counter  ;
+                next_state          = next_state                    ;
+                next_recBits        = next_recBits                  ; 
+                next_recBytes       = next_recBytes                 ;
+                next_tick_counter   = next_tick_counter             ;
             end
         endcase
     end
 
+    assign o_data = recByte; // output frame
 
+    
     function integer clogb2;
     input integer value;
     for (clogb2 = 0; value > 0; clogb2 = clogb2 + 1) begin
-        // divide por dos
         value = value >> 1;
     end
     endfunction
