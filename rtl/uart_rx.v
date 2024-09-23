@@ -85,7 +85,9 @@ module uart_rx
                 end
             end
             RECEIVE: begin
-                if(tick_counter == (NB_STOP-1))
+                if(tick_counter == (NB_STOP-1)) begin 
+                    
+                end
                 
             end
             STOP: begin
