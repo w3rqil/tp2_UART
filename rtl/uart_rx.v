@@ -32,12 +32,12 @@ module uart_rx
     output  wire                    o_rxdone
 );
     reg [clogb2(NB_STOP-1)-1:0]   tick_counter                ; //! tick counter
-    reg [NB_STOP-1:0]   next_tick_counter           ; //! next value of tick_counter
-    reg [3:0]           state, next_state           ;
-    reg [2:0]           recBits                     ; //! received bits
-    reg [2:0]           next_recBits                ;
-    reg [NB_DATA-1:0]   recBytes                    ; //! received frame
-    reg [NB_DATA-1:0]   next_recBytes               ;
+    reg [clogb2(NB_STOP-1)-1:0]   next_tick_counter           ; //! next value of tick_counter
+    reg [3:0]                     state, next_state           ;
+    reg [clogb2(NB_DATA-1)-1:0]   recBits                     ; //! received bits
+    reg [clogb2(NB_DATA-1)-1:0]   next_recBits                ;
+    reg [NB_DATA-1:0]             recBytes                    ; //! received frame
+    reg [NB_DATA-1:0]             next_recBytes               ;
     localparam [3:0] 
                     IDLE    = 0001,
                     START   = 0010,
@@ -48,7 +48,7 @@ module uart_rx
     always @(posedge clk or negedge i_rst_n) begin
         if(!i_rst_n) begin
             state <= IDLE                           ;
-            tick_counter <= 0                              ;
+            tick_counter <= 0                       ;
             recBits <= 0                            ;
             recBytes <= 0                           ;
         end else begin
