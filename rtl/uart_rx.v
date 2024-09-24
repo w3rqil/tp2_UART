@@ -40,7 +40,7 @@ module uart_rx
     reg [clogb2(NB_DATA-1)-1:0]   next_recBits                      ;
     reg [NB_DATA-1:0]             recByte                           ; //! received frame
     reg [NB_DATA-1:0]             next_recByte                      ;
-
+    reg                           done_bit                          ;
 
     localparam [3:0]    //! states
                     IDLE    = 0001,
@@ -55,6 +55,7 @@ module uart_rx
             tick_counter <= 0                                       ;
             recBits <= 0                                            ;
             recBytes <= 0                                           ;
+            done_bit <= 0                                           ;
         end else begin              
             state <= next_state                                     ;
             tick_counter <= next_tick_counter                       ;
@@ -105,7 +106,7 @@ module uart_rx
                 if(i_tick) begin
                     if(tick_counter == (NB_STOP-1)) begin
                         next_state = IDLE                           ;
-                        if(i_data) o_rxdone = 1                     ;
+                        if(i_data) done_bit = 1                     ;
                     end else begin
                         next_tick_counter = tick_counter + 1        ;
                     end
@@ -121,8 +122,8 @@ module uart_rx
         endcase
     end
 
-    assign o_data = recByte; // output frame
-
+    assign o_data   = recByte   ; // output frame
+    assign o_rxdone = done_bit  ;
     
     function integer clogb2;
     input integer value;
