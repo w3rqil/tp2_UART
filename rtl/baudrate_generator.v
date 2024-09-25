@@ -6,7 +6,7 @@ module baudrate_generator
 )(
     input   wire clk                                                    ,
     input   wire i_rst_n                                                ,
-    output  reg  o_tick                                                   //! tick que se genera cada NC_PER_TICK
+    output  wire o_tick                                                   //! tick que se genera cada NC_PER_TICK
 
 );
 
