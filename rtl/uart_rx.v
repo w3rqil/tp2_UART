@@ -53,8 +53,8 @@ module uart_rx
         if(!i_rst_n) begin
             state <= IDLE                                           ;
             tick_counter <= 0                                       ;
-            recBits <= 0                                            ;
-            recBytes <= 0                                           ;
+            recBits  <= 0                                           ;
+            recByte  <= 0                                           ;
             done_bit <= 0                                           ;
         end else begin              
             state <= next_state                                     ;
@@ -116,7 +116,7 @@ module uart_rx
             default: begin 
                 next_state          = next_state                    ;
                 next_recBits        = next_recBits                  ; 
-                next_recBytes       = next_recBytes                 ;
+                next_recByte        = next_recByte                  ;
                 next_tick_counter   = next_tick_counter             ;
             end
         endcase
