@@ -18,6 +18,7 @@ module uart_interface
     wire [NB_DATA-1:0] datoA, next_datoA;
     wire [NB_DATA-1:0] datoB, next_datoB;
     wire [NB_OP-1:0] op, next_op;
+    reg  [NB_DATA - 1 : 0] leds_reg;
 
 
     localparam [5:0]
@@ -112,7 +113,7 @@ module uart_interface
             end
         endcase
     end
-
+    assign o_data = leds_reg;
     alu
     #(
         .NB_DATA(NB_DATA),
@@ -124,7 +125,7 @@ module uart_interface
         .i_datoA(datoA),
         .i_datoB(datoB),
         .i_operation(operation),
-        .o_leds()
+        .o_leds(leds_reg)
     );
 
 endmodule
