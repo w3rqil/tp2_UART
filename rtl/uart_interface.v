@@ -1,7 +1,7 @@
 module uart_interface
 #(
     NB_DATA  = 8                                                    ,
-    NB_STOP  = 16 //stops at 16 count                               ,
+    NB_STOP  = 16 , //stops at 16 count                               
     NB_OP    = 6
 )(
     input       wire                            clk                 ,
@@ -11,14 +11,21 @@ module uart_interface
     output      wire        [NB_DATA - 1 : 0]   o_data
 );
 
-    wire  [3:0]                  state, next_state                                    ;
-    wire  [1:0]                  done_counter, next_done_counter                      ;
-    wire  [NB_DATA-1:0]      type_reg, received_reg                                 ;
-    wire                     valid, next_valid;
-    wire [NB_DATA-1:0] datoA, next_datoA;
-    wire [NB_DATA-1:0] datoB, next_datoB;
-    wire [NB_OP-1:0] op, next_op;
-    reg  [NB_DATA - 1 : 0] leds_reg;
+    reg  [3:0]                  state                             ;
+    reg  [1:0]                  done_counter                      ;
+    reg [NB_OP-1:0] op;
+    reg [NB_DATA-1:0] datoB;
+    reg [NB_DATA-1:0] datoA;
+    reg                     valid;
+    
+    wire  [3:0]                  next_state                       ;
+    wire  [1:0]                  next_done_counter                ;
+    wire  [NB_DATA-1:0]      type_reg                             ;
+    wire                     next_valid;
+    wire [NB_DATA-1:0] next_datoA;
+    wire [NB_DATA-1:0] next_datoB;
+    wire [NB_OP-1:0] next_op;
+    wirw  [NB_DATA - 1 : 0] leds_reg;
 
 
     localparam [5:0]
