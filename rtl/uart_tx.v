@@ -96,7 +96,7 @@ module uart_tx
             STOP: begin 
                 next_tx= 1'b1                                           ;
                 if(i_tick) begin
-                    if(tick_counter == (NB_STOP-1=)) begin
+                    if(tick_counter == (NB_STOP-1)) begin
                         next_state = IDLE                               ;
                         done_bit = 1                                    ;
                     end
