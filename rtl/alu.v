@@ -12,8 +12,8 @@ module alu
     output  wire    signed [NB_DATA-1:0]   o_leds                                                 //! output  
 );
 
-    wire signed [NB_DATA-1:0] result                                                             ; //! Resultado de la operación
-    wire signed [NB_DATA-1:0] aux_result = 8'h00                                                 ; //! Resultado auxiliar
+    reg signed [NB_DATA-1:0] result                                                             ; //! Resultado de la operación
+    reg signed [NB_DATA-1:0] aux_result = 8'h00                                                 ; //! Resultado auxiliar
     
     localparam [NB_OP-1:0] //! Operation cases
         OP_ADD = 6'b100000                                                                      , //! ADD operation

@@ -11,21 +11,21 @@ module uart_interface
     output      wire        [NB_DATA - 1 : 0]   o_data
 );
 
-    reg  [3:0]                  state                             ;
+    reg  [5:0]                  state                             ;
     reg  [1:0]                  done_counter                      ;
     reg [NB_OP-1:0] op;
     reg [NB_DATA-1:0] datoB;
     reg [NB_DATA-1:0] datoA;
     reg                     valid;
     
-    wire  [3:0]                  next_state                       ;
-    wire  [1:0]                  next_done_counter                ;
-    wire  [NB_DATA-1:0]      type_reg                             ;
-    wire                     next_valid;
-    wire [NB_DATA-1:0] next_datoA;
-    wire [NB_DATA-1:0] next_datoB;
-    wire [NB_OP-1:0] next_op;
-    wirw  [NB_DATA - 1 : 0] leds_reg;
+    reg  [3:0]                  next_state                       ;
+    reg  [1:0]                  next_done_counter                ;
+    reg  [NB_DATA-1:0]      type_reg                             ;
+    reg                     next_valid;
+    reg [NB_DATA-1:0] next_datoA;
+    reg [NB_DATA-1:0] next_datoB;
+    reg [NB_OP-1:0] next_op;
+    wire  [NB_DATA - 1 : 0] leds_reg;
 
 
     localparam [5:0]
@@ -72,37 +72,25 @@ module uart_interface
             end
             PARSER: begin
                 next_valid = 0;
-                case(type_reg)
-                    DATOA: begin
-                        if(i_rxDone) begin
+                if(i_rxDone) begin
+                    case(type_reg)
+                        DATOA: begin
                             next_datoA = i_rx;
-                            next_done_counter = done_counter + 1;
-                            if (done_counter == 2) begin
-                                next_state = STOP;
-                            end
                         end
-                    end
-                    DATOB: begin
-                        if (i_rxDone) begin
+                        DATOB: begin
                             next_datoB = i_rx;
-                            next_done_counter = done_counter + 1;
-                            if (done_counter == 2) begin
-                                next_state = STOP;
-                            end
                         end
-                    end
-                    OP: begin
-                        next_op = i_rx;
-                        next_valid = 1;
-                        next_done_counter = done_counter + 1;
-                        if (done_counter == 2) begin
-                            next_state = STOP;
-                        end                     
-                    end
-                endcase
+                        OP: begin
+                            next_op = i_rx;
+                            next_valid = 1;
+                        end
+                    endcase
+                    next_done_counter = done_counter + 1;
+                end
+                next_state = (done_counter == 2) ? STOP : PARSER;  
             end
             STOP: begin
-                state <= IDLE                                           ;
+                next_state <= IDLE                                           ;
                 done_counter <= 0                                       ;
                 valid <= 0 ;
                 datoA <= 0;
