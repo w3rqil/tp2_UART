@@ -33,14 +33,14 @@ module uart_rx
 );
 
 
-    reg [clogb2(NB_STOP-1)-1:0]   tick_counter                      ; //! tick counter
-    reg [clogb2(NB_STOP-1)-1:0]   next_tick_counter                 ; //! next value of tick_counter
-    reg [3:0]                     state, next_state                 ;
-    reg [clogb2(NB_DATA-1)-1:0]   recBits                           ; //! received bits
-    reg [clogb2(NB_DATA-1)-1:0]   next_recBits                      ;
-    reg [NB_DATA-1:0]             recByte                           ; //! received frame
-    reg [NB_DATA-1:0]             next_recByte                      ;
-    reg                           done_bit                          ;
+    wire [clogb2(NB_STOP-1)-1:0]   tick_counter                      ; //! tick counter
+    wire [clogb2(NB_STOP-1)-1:0]   next_tick_counter                 ; //! next value of tick_counter
+    wire [3:0]                     state, next_state                 ;
+    wire [clogb2(NB_DATA-1)-1:0]   recBits                           ; //! received bits
+    wire [clogb2(NB_DATA-1)-1:0]   next_recBits                      ;
+    wire [NB_DATA-1:0]             recByte                           ; //! received frame
+    wire [NB_DATA-1:0]             next_recByte                      ;
+    wire                           done_bit                          ;
 
     localparam [3:0]    //! states
                     IDLE    = 0001,
