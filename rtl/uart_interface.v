@@ -18,14 +18,14 @@ module uart_interface
     reg [NB_DATA - 1 : 0]   datoA                                           ;
     reg                     valid                                           ;
     
-    reg  [3:0]              next_state                                      ;
+    reg  [5:0]              next_state                                      ;
     reg  [1:0]              next_done_counter                               ;
-    reg  [NB_DATA - 1 : 0]  type_reg                                        ;
+    reg  [5:0]              type_reg                                        ;
     reg                     next_valid                                      ;
     reg  [NB_DATA - 1 : 0]  next_datoA                                      ;
     reg  [NB_DATA - 1 : 0]  next_datoB                                      ;
     reg  [NB_OP - 1 : 0  ]  next_op                                         ;
-    wire [NB_DATA - 1 : 0]  leds_reg                                        ;
+    wire signed [NB_DATA - 1 : 0]  leds_reg                                        ;
 
 
     localparam [5:0]
@@ -62,7 +62,7 @@ module uart_interface
                 if (i_rxDone) begin 
                     next_state = PARSER                                     ;
                     next_done_counter = done_counter + 1                    ;
-                    type_reg = i_rx                                         ;
+                    type_reg = i_rx[5:0]                                         ;
 
                 end else begin                  
                     next_state = IDLE                                       ;
@@ -87,15 +87,16 @@ module uart_interface
                     endcase
                     next_done_counter = done_counter + 1                    ;
                 end
-                next_state = (done_counter == 2) ? STOP : PARSER            ;  
+                next_state = (done_counter == 2) ? STOP : PARSER            ;
+                //next_done_counter = 0                                       ;  
             end
             STOP: begin
-                next_state <= IDLE                                          ;
-                done_counter <= 0                                           ;
-                valid <= 0                                                  ;
-                datoA <= 0                                                  ;
-                datoB <= 0                                                  ;
-                op <= 0                                                     ;                
+                next_state = IDLE                                          ;
+                next_done_counter = 0                                           ;
+                next_valid = 0                                                  ;
+                next_datoA = 0                                                  ;
+                next_datoB = 0                                                  ;
+                next_op = 0                                                     ;                
             end
             default: begin
                 next_datoA =   next_datoA                                   ;
@@ -109,7 +110,7 @@ module uart_interface
         endcase
     end
     assign o_data = leds_reg;
-    
+
     alu
     #(
         .NB_DATA        (NB_DATA    ),
