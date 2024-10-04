@@ -1,11 +1,11 @@
-`timescale 1ns / 1ps
+`timescale 1ns/1ps
 
 module tb_uart_interface;
 
     // Parameters
-    parameter NB_DATA = 8;
-    parameter NB_STOP = 16;
-    parameter NB_OP = 6;
+    localparam NB_DATA  = 8;
+    localparam NB_STOP  = 16;
+    localparam NB_OP    = 6;
 
     // Inputs
     reg clk;
@@ -16,8 +16,12 @@ module tb_uart_interface;
     // Outputs
     wire [NB_DATA - 1 : 0] o_data;
 
-    // Instantiate the Unit Under Test (UUT)
-    uart_interface uut (
+    // Instantiate the DUT (Device Under Test)
+    uart_interface #(
+        .NB_DATA(NB_DATA),
+        .NB_STOP(NB_STOP),
+        .NB_OP(NB_OP)
+    ) dut (
         .clk(clk),
         .i_rx(i_rx),
         .i_rxDone(i_rxDone),
@@ -25,57 +29,82 @@ module tb_uart_interface;
         .o_data(o_data)
     );
 
-    // Clock Generation
+    // Clock generation
     initial begin
         clk = 0;
-        forever #5 clk = ~clk; // Clock period = 10 ns
+        forever #5 clk = ~clk; // 100MHz clock
     end
 
-    // Stimulus
+    // Test vectors
     initial begin
-        // Initialize Inputs
+        // Initialize inputs
         i_rx = 0;
         i_rxDone = 0;
         i_rst_n = 0;
 
-        // Apply reset
+        // Reset the DUT
         #10;
         i_rst_n = 1;
-
-        // Test Case 1: Send DatoA
-        #10; 
-        i_rx = 8'b00000001; // Simulate DatoA
-        i_rxDone = 1; 
-        #10; 
-        i_rxDone = 0; // Clear the done signal
-
-        // Test Case 2: Send DatoB
-        #10; 
-        i_rx = 8'b00000010; // Simulate DatoB
-        i_rxDone = 1; 
-        #10; 
-        i_rxDone = 0; // Clear the done signal
-
-        // Test Case 3: Send Operation
-        #10; 
-        i_rx = 8'b00000011; // Simulate Operation
-        i_rxDone = 1; 
-        #10; 
-        i_rxDone = 0; // Clear the done signal
-
-        // Test Case 4: Verify output after sending DatoA, DatoB and Operation
+        #10;
+        i_rst_n = 0;
+        #100
+        i_rst_n = 1;
         #10;
 
-        // Assert output (o_data) - Add checks based on expected behavior
-        // You can add specific checks here based on expected outputs
-        if (o_data !== expected_output) begin
-            $display("Error: o_data is not as expected! Got: %b", o_data);
-        end else begin
-            $display("Test Passed! o_data: %b", o_data);
-        end
+        // Test ADD operation
+        // Load DATOA
+        i_rx = 8'b00001000;
+        i_rxDone = 1;
+        #10;
+        i_rxDone = 0;
+        #10;
+        i_rx = 8'b00000001;
+        i_rxDone = 1;
+        #10;
+        i_rxDone = 0;
+        #10;
+        // Load DATOB
+        i_rx = 8'b00010000;
+        i_rxDone = 1;
+        #10;
+        i_rxDone = 0;
+        #10;
+        i_rx = 8'b00000001;
+        i_rxDone = 1;
+        #10;
+        i_rxDone = 0;
+        #10;
 
-        // End of simulation
+        // Load OP (ADD)
+        i_rx = 8'b00100000; // op code
+        i_rxDone = 1;
+        #10;
+        i_rxDone = 0;
+        #10;
+        i_rx = 8'b00100000; // add code
+        i_rxDone = 1;
+        #10;
+        i_rxDone = 0;
+        #10;
+
+        // Check result
         #20;
+        $display("ADD Result: %d", o_data);
+
+        i_rx = 8'b00100000; // op code
+        i_rxDone = 1;
+        #10;
+        i_rxDone = 0;
+        #10;
+        i_rx = 8'b00100010; // sub code
+        i_rxDone = 1;
+        #10;
+        i_rxDone = 0;
+        #10;
+
+        #20;
+        $display("SUB Result: %d", o_data);
         $finish;
     end
+
 endmodule
