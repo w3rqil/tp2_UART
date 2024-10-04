@@ -3,13 +3,13 @@ module uart_tx
     NB_DATA = 8,
     NB_STOP = 16
 )(
-    input   wire clk                                                    ,
-    input   wire i_rst_n                                                ,
-    input   wire i_tick                                                 ,
-    input   wire i_start_tx                                             ,
-    input   wire [NB_DATA - 1 : 0] i_data                               ,
-    output  wire o_txdone                                               ,
-    output  wire o_data
+    input   wire                    clk                                  ,
+    input   wire                    i_rst_n                              ,
+    input   wire                    i_tick                               ,
+    input   wire                    i_start_tx                           ,
+    input   wire [NB_DATA - 1 : 0]  i_data                               ,
+    output  wire                    o_txdone                             ,
+    output  wire                    o_data
 
 );
 
