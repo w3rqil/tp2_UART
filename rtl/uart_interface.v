@@ -1,14 +1,15 @@
 module uart_interface
 #(
-    NB_DATA  = 8                                                            ,
-    NB_STOP  = 16                                                           , //stops at 16 count                               
-    NB_OP    = 6
+    NB_DATA  = 8                                                            , //! number bits data
+    NB_STOP  = 16                                                           , //! stops at 16 count                               
+    NB_OP    = 6                                                              //! number bits operation
 )(
-    input       wire                            clk                         ,
-    input       wire signed       [NB_DATA - 1 : 0]   i_rx                  ,
-    input       wire                            i_rxDone                    ,
-    input       wire                            i_rst_n                     ,     
-    output      wire        [NB_DATA - 1 : 0]   o_data
+    input       wire                            clk                         , //! project clock
+    input       wire signed [NB_DATA - 1 : 0]   i_rx                        , //! Inpur from UART_RX module
+    input       wire                            i_rxDone                    , //! UART_RX done bit
+    input       wire                            i_txDone                    , //! UART_TX done bit
+    input       wire                            i_rst_n                     , //! negative edge reset
+    output      wire        [NB_DATA - 1 : 0]   o_data                        //! Output result for UART_TX module
 );
 
     // Estados de la máquina de estados
@@ -58,7 +59,7 @@ module uart_interface
         end
     end
 
-    // state machine
+    // RX-ALU interface
     always @(*) begin
         case(state)
             IDLE: begin
@@ -110,6 +111,11 @@ module uart_interface
                 
             end
         endcase
+    end
+
+    //! ALU-TX interface
+    always @(*) begin 
+        
     end
     assign o_data = leds_reg;
 
