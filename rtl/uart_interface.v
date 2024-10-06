@@ -9,7 +9,21 @@ module uart_interface
     input       wire                            i_rxDone                    , //! UART_RX done bit
     input       wire                            i_txDone                    , //! UART_TX done bit
     input       wire                            i_rst_n                     , //! negative edge reset
-    output      wire        [NB_DATA - 1 : 0]   o_data                        //! Output result for UART_TX module
+    output      wire                            o_tx_start                  ,
+    output      wire        [NB_DATA - 1 : 0]   o_data                      , //! Output result for UART_TX module
+
+
+
+    /*
+        ------------------------
+        ------- ALU I/O --------
+        ------------------------
+    */
+    output      wire        [NB_OP   - 1 : 0]   o_operation                ,
+    output      wire        [NB_DATA - 1 : 0]   o_datoB                    ,
+    output      wire        [NB_DATA - 1 : 0]   o_datoA                    ,
+    output      wire                            o_valid                    ,
+    input       wire        [NB_DATA - 1 : 0]   i_result                    
 );
 
     // Estados de la máquina de estados
@@ -25,19 +39,21 @@ module uart_interface
     OP      = 6'b100000;
     reg [2:0]               state                                           ;
     reg [1:0]               done_counter                                    ;
+    // ALU
     reg [NB_OP   - 1 : 0]   op                                              ;
     reg [NB_DATA - 1 : 0]   datoB                                           ;
     reg [NB_DATA - 1 : 0]   datoA                                           ;
     reg                     valid                                           ;
-    
-    reg  [2:0]              next_state                                      ;
-    reg  [1:0]              next_done_counter                               ;
-    reg  [5:0]              type_reg                                        ;
     reg                     next_valid                                      ;
     reg  [NB_DATA - 1 : 0]  next_datoA                                      ;
     reg  [NB_DATA - 1 : 0]  next_datoB                                      ;
     reg  [NB_OP - 1 : 0  ]  next_op                                         ;
     wire signed [NB_DATA - 1 : 0]  leds_reg                                 ;
+    // vars
+    reg                     tx_start, next_tx_start                         ;
+    reg  [2:0]              next_state                                      ;
+    reg  [1:0]              next_done_counter                               ;
+    reg  [5:0]              type_reg                                        ;
 
 
     always @(posedge clk or negedge i_rst_n) begin
@@ -47,6 +63,7 @@ module uart_interface
             valid <= 0                                                      ;
             datoA <= 0                                                      ;
             datoB <= 0                                                      ;
+            tx_start <= 0                                                   ;
             op <= 0                                                         ;
         end else begin              
             state <= next_state                                             ;
@@ -55,6 +72,7 @@ module uart_interface
             datoA <= next_datoA                                             ;
             datoB <= next_datoB                                             ;
             op <= next_op                                                   ;
+            tx_start <= next_tx_start                                       ;
 
         end
     end
@@ -67,7 +85,7 @@ module uart_interface
                     //next_done_counter = done_counter + 1                    ;
                     type_reg = i_rx[NB_OP-1:0]                              ;
                     next_state = PARSE                                      ;
-
+                    
                 end else begin                  
                     next_state = IDLE                                       ;
                     next_done_counter = 0                                   ;
@@ -86,6 +104,7 @@ module uart_interface
                         else if (type_reg== OP) begin                           
                             next_op = i_rx[NB_OP-1:0]                       ;
                             next_valid = 1                                  ;
+                            next_tx_start = 1'b1                            ;
                         end
                     
                     next_done_counter =  1                                  ;
@@ -97,6 +116,7 @@ module uart_interface
                 next_state = IDLE                                           ;
                 next_done_counter = 0                                       ;
                 next_valid = 0                                              ;
+                next_tx_start = 1'b0                                        ;
             //    next_datoA = 0                                              ;
             //    next_datoB = 0                                              ;
             //    next_op = 0                                                 ;                
@@ -114,11 +134,18 @@ module uart_interface
     end
 
     //! ALU-TX interface
-    always @(*) begin 
-        
-    end
-    assign o_data = leds_reg;
 
+
+    // assign
+
+    assign o_operation  = op                                                ;
+    assign o_datoA      = datoA                                             ;
+    assign o_datoB      = datoB                                             ;
+    assign o_valid      = valid                                             ;
+    assign o_tx_start   = tx_start                                          ;
+    assign o_data       = i_result                                          ;
+    //assign o_data = leds_reg;
+/*
     alu
     #(
         .NB_DATA        (NB_DATA    ),
@@ -132,5 +159,5 @@ module uart_interface
         .i_operation    (op         ),
         .o_leds         (leds_reg   )
     );
-
+*/
 endmodule
