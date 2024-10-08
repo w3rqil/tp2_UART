@@ -23,14 +23,12 @@ baudrate_generator
 );
 
 // Clock generation
-initial begin
-    clk = 0;
-    forever #5 clk = ~clk; // 100 MHz clock (10 ns period)
-end
+always #5 clk = ~clk;
 
 // Test sequence
 initial begin
     // Initialize inputs
+    clk = 0;
     i_rst_n = 0;
 
     // Apply reset
