@@ -43,11 +43,11 @@ module tb_uart_rx;
         forever #5 clk = ~clk; // 100MHz clock
     end
 
-    // Monitor signals for debugging
-    initial begin
-        $monitor("Time: %0t | i_data: %b | o_tick: %b | o_data: %b | o_rxdone: %b", 
-                  $time, i_data, o_tick, o_data, o_rxdone);
-    end
+    // // Monitor signals for debugging
+    // initial begin
+    //     $monitor("Time: %0t | i_data: %b | o_tick: %b | o_data: %b | o_rxdone: %b", 
+    //               $time, i_data, o_tick, o_data, o_rxdone);
+    // end
 
     // Test sequence
     initial begin
@@ -64,32 +64,32 @@ module tb_uart_rx;
 
         // Send a start bit
         i_data = 0; // Start bit
-        @(posedge o_tick);
+        repeat(16) @(posedge o_tick);
         
-        // Send data bits (example: 0b10101010)
-        i_data = 1;
-        @(posedge o_tick);
-        i_data = 0;
-        @(posedge o_tick);
-        i_data = 1;
-        @(posedge o_tick);
-        i_data = 0;
-        @(posedge o_tick);
-        i_data = 1;
-        @(posedge o_tick);
-        i_data = 0;
-        @(posedge o_tick);
-        i_data = 1;
-        @(posedge o_tick);
-        i_data = 0;
-        @(posedge o_tick);
+    // Send data bits (example: 0b11100010)
+        i_data = 1; // Bit 7
+        repeat(16) @(posedge o_tick); // Espera 16 ticks
+        i_data = 1; // Bit 6
+        repeat(16) @(posedge o_tick); // Espera 16 ticks
+        i_data = 1; // Bit 5
+        repeat(16) @(posedge o_tick); // Espera 16 ticks
+        i_data = 0; // Bit 4
+        repeat(16) @(posedge o_tick); // Espera 16 ticks
+        i_data = 0; // Bit 3
+        repeat(16) @(posedge o_tick); // Espera 16 ticks
+        i_data = 0; // Bit 2
+        repeat(16) @(posedge o_tick); // Espera 16 ticks
+        i_data = 1; // Bit 1
+        repeat(16) @(posedge o_tick); // Espera 16 ticks
+        i_data = 0; // Bit 0
+        repeat(16) @(posedge o_tick); // Espera 16 ticks
 
         // Send stop bits
         i_data = 1;
         repeat(NB_STOP) @(posedge o_tick);
 
         // Wait for RX done
-        wait(o_rxdone);
+        // wait(o_rxdone);
 
         // Check received data
         if (o_data == 8'b10101010) begin
@@ -98,6 +98,11 @@ module tb_uart_rx;
             $display("Test Failed: Received data is incorrect: %b", o_data);
         end
 
-        $stop;
+        // // Wait a bit to observe the DONE state
+        // repeat(5) @(posedge o_tick); // You can adjust the number of ticks to observe
+        
+        $display("Finalizando la simulación en el tiempo: %0t", $time);
+        // Finish the simulation
+        $finish; // This will stop the simulation
     end
 endmodule
