@@ -1,14 +1,14 @@
 module top 
 #(
-    NB_DATA = 8         ,
-    NB_STOP = 16        ,
-    NB_OP   = 6         ,
-    NC_PER_TICK = 163   ,      
-    NB_COUNTER = 8
-)(
-    input   wire    clk     ,
-    input   wire    i_rst_n ,
-    input   wire    i_rx    ,
+    NB_DATA = 8                             ,
+    NB_STOP = 16                            ,
+    NB_OP   = 6                             ,
+    NC_PER_TICK = 163                       ,      
+    NB_COUNTER = 8              
+)(              
+    input   wire    clk                     ,
+    input   wire    i_rst_n                 ,
+    input   wire    i_rx                    ,
     output  wire    o_tx    
 );
 
@@ -17,11 +17,11 @@ module top
     wire tick;
 
     // interface2ALU
-    wire                    valid_i2ALU ;
-    wire [NB_DATA - 1 : 0]  datoA_i2ALU ;
-    wire [NB_DATA - 1 : 0]  datoB_i2ALU ;
-    wire [NB_DATA - 1 : 0]  op_i2ALU    ;
-    wire [NB_DATA - 1 : 0]  res_i2ALU   ;
+    wire                    valid_i2ALU     ;
+    wire [NB_DATA - 1 : 0]  datoA_i2ALU     ;
+    wire [NB_DATA - 1 : 0]  datoB_i2ALU     ;
+    wire [NB_DATA - 1 : 0]  op_i2ALU        ;
+    wire [NB_DATA - 1 : 0]  res_i2ALU       ;
 
     // interface2UART
     wire                    rxDone          ;
@@ -62,7 +62,7 @@ module top
         .clk        (clk            ),
         .i_rst_n    (i_rst_n        ),
         .i_tick     (tick           ),
-        .i_tx_start (txStart        ),
+        .i_start_tx (txStart        ),
         .i_data     (data_i2TX      ),
         .o_txdone   (txDone         ),
         .o_data     (o_tx           ) //???????????????????????????????????????
@@ -87,7 +87,7 @@ module top
         .o_datoB    (datoB_i2ALU    ),
         .o_datoA    (datoA_i2ALU    ),
         .o_valid    (valid_i2ALU    ),
-        .i_resuñt   (res_i2ALU      )
+        .i_result   (res_i2ALU      )
 
     );
 

@@ -95,17 +95,26 @@ module uart_interface
             PARSE: begin
                 next_valid = 0                                              ;
                 if (i_rxDone) begin                          
-                        if(type_reg == DATOA) begin                 
-                            next_datoA = i_rx                               ;
-                        end                         
-                        else if(type_reg == DATOB) begin                            
-                            next_datoB = i_rx                               ;
-                        end                         
-                        else if (type_reg== OP) begin                           
-                            next_op = i_rx[NB_OP-1:0]                       ;
-                            next_valid = 1                                  ;
-                            next_tx_start = 1'b1                            ;
-                        end
+                        case(type_reg) 
+                            DATOA: begin               
+                                next_datoA = i_rx                           ;
+                            end      
+                            DATOB : begin                
+                                next_datoB = i_rx                           ;
+                            end            
+                            OP: begin                       
+                                next_op = i_rx[NB_OP-1:0]                   ;
+                                next_valid = 1                              ;
+                                next_tx_start = 1'b1                        ;
+                            end
+                            default: begin
+                                next_datoA =   next_datoA                   ;
+                                next_datoB = next_datoB                     ;
+                                next_op = next_op                           ;
+                                next_tx_start = next_tx_start               ;
+                                next_valid = next_valid                     ;
+                            end
+                        endcase
                     
                     next_done_counter =  1                                  ;
                 end
