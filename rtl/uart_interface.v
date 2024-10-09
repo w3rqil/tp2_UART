@@ -79,6 +79,14 @@ module uart_interface
 
     // RX-ALU interface
     always @(*) begin
+        next_state = state;
+        next_done_counter = done_counter;
+        next_valid = valid;
+        next_datoA = datoA;
+        next_datoB = datoB;
+        next_op = op;
+        next_tx_start = tx_start;
+        type_reg = i_rx[NB_OP-1:0];
         case(state)
             IDLE: begin
                 if (i_rxDone) begin 
@@ -105,7 +113,7 @@ module uart_interface
                             OP: begin                       
                                 next_op = i_rx[NB_OP-1:0]                   ;
                                 next_valid = 1                              ;
-                                next_tx_start = 1'b1                        ;
+                                next_tx_start = 1                           ;
                             end
                             default: begin
                                 next_datoA =   next_datoA                   ;

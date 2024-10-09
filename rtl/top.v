@@ -20,7 +20,7 @@ module top
     wire                    valid_i2ALU     ;
     wire [NB_DATA - 1 : 0]  datoA_i2ALU     ;
     wire [NB_DATA - 1 : 0]  datoB_i2ALU     ;
-    wire [NB_DATA - 1 : 0]  op_i2ALU        ;
+    wire [NB_OP   - 1 : 0]  op_i2ALU        ;
     wire [NB_DATA - 1 : 0]  res_i2ALU       ;
 
     // interface2UART
