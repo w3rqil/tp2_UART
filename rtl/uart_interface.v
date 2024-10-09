@@ -53,7 +53,7 @@ module uart_interface
     reg                     tx_start, next_tx_start                         ;
     reg  [2:0]              next_state                                      ;
     reg  [1:0]              next_done_counter                               ;
-    reg  [5:0]              type_reg                                        ;
+    reg  [NB_OP - 1 : 0]    type_reg                                        ;
 
 
     always @(posedge clk or negedge i_rst_n) begin

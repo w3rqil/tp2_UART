@@ -62,7 +62,7 @@ module top
         .clk        (clk            ),
         .i_rst_n    (i_rst_n        ),
         .i_tick     (tick           ),
-        .i_tx_start (txStart        ),
+        .i_start_tx (txStart        ),
         .i_data     (data_i2TX      ),
         .o_txdone   (txDone         ),
         .o_data     (o_tx           ) //???????????????????????????????????????
@@ -87,7 +87,7 @@ module top
         .o_datoB    (datoB_i2ALU    ),
         .o_datoA    (datoA_i2ALU    ),
         .o_valid    (valid_i2ALU    ),
-        .i_resuñt   (res_i2ALU      )
+        .i_result   (res_i2ALU      )
 
     );
 
