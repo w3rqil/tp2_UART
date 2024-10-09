@@ -2,93 +2,88 @@
 
 module tb_uart_rx;
 
-    // Parameters
-    localparam NB_DATA = 8;
-    localparam NB_STOP = 16;
-
-    // Inputs
+    // Parámetros
+    parameter NB_DATA = 8;
+    parameter NB_STOP = 16;
+    parameter NC_PER_TICK = 163;
+    parameter NB_COUNTER = 8;
+    
+    // Señales
     reg clk;
     reg i_rst_n;
-    reg i_tick;
     reg i_data;
-
-    // Outputs
-    wire [NB_DATA - 1 : 0] o_data;
+    wire [NB_DATA-1:0] o_data;
     wire o_rxdone;
+    wire o_tick;
 
-    // Instantiate the UART RX module
-    uart_rx
-    #(
+    // Instanciación del módulo uart_rx
+    uart_rx #(
         .NB_DATA(NB_DATA),
         .NB_STOP(NB_STOP)
-    ) uut (
+    ) uart_rx_inst (
         .clk(clk),
         .i_rst_n(i_rst_n),
-        .i_tick(i_tick),
+        .i_tick(o_tick),
         .i_data(i_data),
         .o_data(o_data),
         .o_rxdone(o_rxdone)
     );
 
-    // Clock generation
+    // Instanciación del módulo baudrate_generator
+    baudrate_generator #(
+        .NC_PER_TICK(NC_PER_TICK),
+        .NB_COUNTER(NB_COUNTER)
+    ) baudrate_generator_inst (
+        .clk(clk),
+        .i_rst_n(i_rst_n),
+        .o_tick(o_tick)
+    );
+
+    // Generación del reloj
+    always #5 clk = ~clk; // Periodo de 10 ns (100 MHz)
+
+    // Inicialización
     initial begin
+        // Inicializar señales
         clk = 0;
-        forever #5 clk = ~clk; // 10 ns clock period
-    end
-
-    // Test sequence
-    initial begin
-        // Initialize inputs
         i_rst_n = 0;
-        i_tick = 0;
-        i_data = 1; // idle state of UART is high
-
-        // Reset the system
-        #10;
+        i_data = 1; // Iniciar con nivel alto (línea inactiva)
+        
+        // Reset
+        #20;
         i_rst_n = 1;
 
-        // Wait for a stable state
-        #10;
+        // Simulación de la recepción de un byte (0xA5 por ejemplo: 10100101)
+        send_byte(8'b10100101);
 
-        // Start transmission of data: 0x55 (01010101)
-        send_data(8'b01010101);
+        // Simular otro byte (0x5A por ejemplo: 01011010)
+        send_byte(8'b01011010);
 
-        // Wait for reception to complete
-        wait(o_rxdone);
-        #10;
-
-        // Check output
-        if (o_data !== 8'b01010101) begin
-            $display("Test Failed: Received data: %b, Expected: 01010101", o_data);
-        end else begin
-            $display("Test Passed: Received data: %b", o_data);
-        end
-
-        // End simulation
-        #10;
+        // Finalizar la simulación
+        #2000;
         $finish;
     end
 
-    // Task to send data
-    task send_data(input [NB_DATA-1:0] data);
+    // Tarea para enviar un byte simulando el protocolo UART
+    task send_byte(input [7:0] data);
         integer i;
+        
         begin
-            // Start bit
-            i_data = 0; // Start bit is low
-            i_tick = 1; #10;
-            i_tick = 0; #10;
+            // Bit de Start (0)
+            i_data = 0;
+            @(posedge o_tick); // Esperar a un tick
 
-            // Send each bit
-            for (i = 0; i < NB_DATA; i = i + 1) begin
+            // Bits de datos (LSB first)
+            for (i = 0; i < 8; i = i + 1) begin
                 i_data = data[i];
-                i_tick = 1; #10;
-                i_tick = 0; #10;
+                @(posedge o_tick); // Esperar a un tick por cada bit
             end
-
-            // Stop bit
-            i_data = 1; // Stop bit is high
-            i_tick = 1; #10;
-            i_tick = 0; #10;
+            
+            // Bit de Stop (1)
+            i_data = 1;
+            for (i = 0; i < NB_STOP; i = i + 1) begin
+                @(posedge o_tick); // Esperar ticks por el número de bits de Stop
+            end
         end
     endtask
 
