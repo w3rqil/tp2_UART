@@ -52,6 +52,7 @@ module tb_uart_rx;
         // Reset
         #20;
         i_rst_n = 1;
+        @(posedge clk);
 
         // Simulación de la recepción de un byte (0xA5 por ejemplo: 10100101)
         send_byte(8'b10100101);
@@ -60,7 +61,8 @@ module tb_uart_rx;
         send_byte(8'b01011010);
 
         // Finalizar la simulación
-        #2000;
+        repeat(80000) @(posedge clk); // Esperar 10000 ticks
+        
         $finish;
     end
 

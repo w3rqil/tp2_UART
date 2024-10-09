@@ -43,10 +43,10 @@ module uart_rx
     reg                           done_bit                          ;
 
     localparam [3:0]    //! states
-                    IDLE    = 0001,
-                    START   = 0010,
-                    RECEIVE = 0100,
-                    STOP    = 1000; 
+                    IDLE    = 4'b0001,
+                    START   = 4'b0010,
+                    RECEIVE = 4'b0100,
+                    STOP    = 4'b1000; 
 
 
     always @(posedge clk or negedge i_rst_n) begin
@@ -76,7 +76,7 @@ module uart_rx
             end
             START: begin
                 if(i_tick) begin
-                    if(tick_counter == (NB_DATA-1)) begin
+                    if(tick_counter == 4'b0111) begin
                         next_state        = RECEIVE                 ;
                         next_tick_counter = 0                       ;
                         next_recBits      = 0                       ;
@@ -88,10 +88,10 @@ module uart_rx
             end
             RECEIVE: begin
                 if(i_tick) begin
-                    if(tick_counter == (NB_STOP-1)) begin 
+                    if(tick_counter == 15) begin 
                         next_tick_counter = 0                       ;
                         recByte = {i_data, recByte[NB_DATA-1:1]}    ; // shiftregister
-                            if(recBits == (NB_DATA -1)) begin 
+                            if(recBits == 7) begin 
                                 next_state = STOP                   ;
                             end else begin 
                                 next_recBits = recBits + 1          ;
