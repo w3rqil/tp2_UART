@@ -95,8 +95,10 @@ module uart_tx
                             next_state = STOP                           ;
 
                         end else begin
-                            next_tick_counter = tick_counter + 1        ;
+                            next_txBits = txBits + 1        ;
                         end
+                    end else begin
+                        next_tick_counter = tick_counter + 1 ;
                     end
                 end
             end
