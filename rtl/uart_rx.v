@@ -40,7 +40,7 @@ module uart_rx
     reg [clogb2(NB_DATA-1)-1:0]   next_recBits                      ;
     reg [NB_DATA-1:0]             recByte                           ; //! received frame
     reg [NB_DATA-1:0]             next_recByte                      ;
-    reg                           done_bit                          ;
+    reg                           done_bit, next_done_bit           ;
 
     localparam [3:0]    //! states
                     IDLE    = 4'b0001,
@@ -54,21 +54,29 @@ module uart_rx
             state <= IDLE                                           ;
             tick_counter <= 0                                       ;
             recBits  <= 0                                           ;
-            recByte  <= 0                                           ;
+            recByte  <= 8'b00000000                                           ;
             done_bit <= 0                                           ;
         end else begin              
             state <= next_state                                     ;
             tick_counter <= next_tick_counter                       ;
             recBits <= next_recBits                                 ;
             recByte <= next_recByte                                 ;
+            done_bit <= next_done_bit;
 
         end
     end
 
     // state machine
     always @(*) begin
+        next_state = state;
+        next_tick_counter = tick_counter;
+        next_recBits = recBits;
+        next_recByte = recByte;
+        next_done_bit = done_bit;
+
         case (state) 
             IDLE: begin
+                next_done_bit = 0; 
                 if(!i_data) begin
                     next_state = START                              ;
                     next_tick_counter = 0                           ;
@@ -90,7 +98,7 @@ module uart_rx
                 if(i_tick) begin
                     if(tick_counter == 15) begin 
                         next_tick_counter = 0                       ;
-                        recByte = {i_data, recByte[NB_DATA-1:1]}    ; // shiftregister
+                        next_recByte = {i_data, recByte[NB_DATA-1:1]}    ; // shiftregister
                             if(recBits == 7) begin 
                                 next_state = STOP                   ;
                             end else begin 
@@ -106,7 +114,7 @@ module uart_rx
                 if(i_tick) begin
                     if(tick_counter == (NB_STOP-1)) begin
                         next_state = IDLE                           ;
-                        if(i_data) done_bit = 1                     ;
+                        if(i_data) next_done_bit = 1                     ;
                     end else begin
                         next_tick_counter = tick_counter + 1        ;
                     end
@@ -114,10 +122,10 @@ module uart_rx
                 
             end
             default: begin 
-                next_state          = next_state                    ;
-                next_recBits        = next_recBits                  ; 
-                next_recByte        = next_recByte                  ;
-                next_tick_counter   = next_tick_counter             ;
+                next_state          = IDLE                    ;
+                //next_recBits        = next_recBits                  ; 
+                //next_recByte        = next_recByte                  ;
+                //next_tick_counter   = next_tick_counter             ;
             end
         endcase
     end
