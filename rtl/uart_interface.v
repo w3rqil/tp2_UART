@@ -54,6 +54,7 @@ module uart_interface
     reg  [2:0]              next_state                                      ;
     reg  [1:0]              next_done_counter                               ;
     reg  [NB_OP - 1 : 0]    type_reg                                        ;
+    reg  [NB_DATA - 1 : 0]  data_reg;
 
 
     always @(posedge clk or negedge i_rst_n) begin
@@ -86,7 +87,7 @@ module uart_interface
         next_datoB = datoB;
         next_op = op;
         next_tx_start = tx_start;
-        type_reg = i_rx[NB_OP-1:0];
+        //type_reg = i_rx[NB_OP-1:0];
         case(state)
             IDLE: begin
                 if (i_rxDone) begin 
