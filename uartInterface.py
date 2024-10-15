@@ -1,129 +1,64 @@
-import tkinter as tk
-from tkinter import messagebox
+import time
+import serial
+import random
 
-class UartReceiver:
-    def __init__(self):
-        self.state = "IDLE"
-        self.tick_counter = 0
-        self.rec_bits = 0
-        self.rec_byte = 0
-        self.done_bit = 0
+BAUDRATE = 19200
+PORT = '/dev/ttyUSB1'
 
-    def reset(self):
-        self.state = "IDLE"
-        self.tick_counter = 0
-        self.rec_bits = 0
-        self.rec_byte = 0
-        self.done_bit = 0
+ser = serial.Serial(
+    port=PORT, 
+    baudrate=BAUDRATE,
+    parity=serial.PARITY_NONE,
+    stopbits=serial.STOPBITS_ONE,
+    bytesize=serial.EIGHTBITS,
+)
 
-    def tick(self, i_data):
-        if self.state == "IDLE":
-            if i_data == 0:  # Esperar el bit de inicio
-                self.state = "START"
-                self.tick_counter = 0
+# ALU commands
+ALU_DATA_A_OP = bytes([0b001000])
+ALU_DATA_B_OP = bytes([0b010000])
+ALU_OPERATOR_OP = bytes([0b100000])
 
-        elif self.state == "START":
-            if self.tick_counter == 7:  # Mitad del bit de inicio
-                self.state = "RECEIVE"
-                self.tick_counter = 0
-                self.rec_bits = 0
-                self.rec_byte = 0
-            else:
-                self.tick_counter += 1
+# ALU operations
+ADD_OP = bytes([0b00100000])
+SUB_OP = bytes([0b00100010])
+AND_OP = bytes([0b00100100])
+OR_OP = bytes([0b00100101])
+XOR_OP = bytes([0b00100110])
+SRA_OP = bytes([0b00000011])
+SRL_OP = bytes([0b00000010])
+NOR_OP = bytes([0b00100111])
 
-        elif self.state == "RECEIVE":
-            if self.tick_counter == 15:  # Mitad del primer bit de datos
-                self.rec_byte = (i_data << (self.rec_bits)) | self.rec_byte  # Shift register
-                self.tick_counter = 0
-                if self.rec_bits == 7:  # Todos los bits de datos recibidos
-                    self.state = "STOP"
-                else:
-                    self.rec_bits += 1
-            else:
-                self.tick_counter += 1
+random.seed(0)
 
-        elif self.state == "STOP":
-            if self.tick_counter == 15:  # Mitad del bit de parada
-                self.state = "IDLE"
-                if i_data == 1:  # Verificar el bit de parada
-                    self.done_bit = 1
+# Function to send data to ALU
+def send_data_to_alu(operator, a_value, b_value):
+    ser.write(ALU_OPERATOR_OP)
+    ser.write(operator)
+    ser.write(ALU_DATA_A_OP)
+    ser.write(bytes([a_value]))
+    ser.write(ALU_DATA_B_OP)
+    ser.write(bytes([b_value]))
 
-    def get_data(self):
-        return self.rec_byte
+# Infinite loop to continuously get results from ALU
+try:
+    while True:
+        operator = random.choice([ADD_OP, SUB_OP, AND_OP, OR_OP, XOR_OP, SRA_OP, SRL_OP, NOR_OP])
+        a_value = random.randint(0, 255)
+        b_value = random.randint(0, 255)
 
-    def is_done(self):
-        return self.done_bit
+        send_data_to_alu(operator, a_value, b_value)
+        
+        # Receive result directly from ALU
+        recv = ser.read(1)  # Read the result sent by the ALU
+        print(f'ALU Operation Result: {recv.hex()} (A: {a_value}, B: {b_value})')
+        
+        time.sleep(0.5)  # Adjust the delay as necessary
 
-class UartInterface:
-    def __init__(self, master):
-        self.master = master
-        self.master.title("UART Receiver Interface")
+except KeyboardInterrupt:
+    print("Process interrupted by user.")
 
-        self.receiver = UartReceiver()
-
-        self.label = tk.Label(master, text="Ingrese un byte (0-255):")
-        self.label.pack()
-
-        self.entry = tk.Entry(master)
-        self.entry.pack()
-
-        self.send_button = tk.Button(master, text="Enviar", command=self.send_data)
-        self.send_button.pack()
-
-        self.datoa_button = tk.Button(master, text="DATOA", command=self.send_datoa)
-        self.datoa_button.pack()
-
-        self.datob_button = tk.Button(master, text="DATOB", command=self.send_datob)
-        self.datob_button.pack()
-
-        self.op_button = tk.Button(master, text="OP", command=self.send_op)
-        self.op_button.pack()
-
-        self.result_label = tk.Label(master, text="")
-        self.result_label.pack()
-
-    def send_data(self):
-        try:
-            byte_input = int(self.entry.get())
-            if byte_input < 0 or byte_input > 255:
-                raise ValueError("El byte debe estar entre 0 y 255.")
-            self.send_byte(byte_input)
-
-        except ValueError as e:
-            messagebox.showerror("Error", str(e))
-
-    def send_datoa(self):
-        self.send_byte(0b10101010)  # Valor predefinido para DATOA
-
-    def send_datob(self):
-        self.send_byte(0b11001100)  # Valor predefinido para DATOB
-
-    def send_op(self):
-        self.send_byte(0b11110000)  # Valor predefinido para OP
-
-    def send_byte(self, byte_input):
-        # Reiniciar el receptor antes de enviar
-        self.receiver.reset()
-
-        # Simular el envío del byte bit a bit
-        for bit_index in range(8):  # Transmitir los 8 bits
-            self.receiver.tick((byte_input >> bit_index) & 1)  # Enviar cada bit
-            # Simular el reloj (tick)
-            self.receiver.tick(0)  # Enviar el bit de inicio
-            for _ in range(15):  # Esperar para el tiempo del bit
-                self.receiver.tick(0)
-
-        self.receiver.tick(1)  # Enviar el bit de parada
-        for _ in range(15):  # Esperar para el tiempo del bit
-            self.receiver.tick(1)
-
-        # Verificar si la recepción fue exitosa
-        if self.receiver.is_done():
-            self.result_label.config(text=f"Byte recibido: {self.receiver.get_data()}")
-        else:
-            self.result_label.config(text="Error en la recepción.")
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = UartInterface(root)
-    root.mainloop()
+finally:
+    # Ensure the serial connection is closed when the script exits
+    if ser.is_open:
+        ser.close()
+    print("Serial connection closed.")
