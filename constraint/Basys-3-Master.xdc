@@ -23,16 +23,16 @@ create_clock -add -name sys_clk_pin -period 10.00 -waveform {0 5} [get_ports { c
 
 
 ## Switches
-set_property -dict { PACKAGE_PIN V17   IOSTANDARD LVCMOS33 } [get_ports {i_dato[0]}]
-set_property -dict { PACKAGE_PIN V16   IOSTANDARD LVCMOS33 } [get_ports {i_dato[1]}]
-set_property -dict { PACKAGE_PIN W16   IOSTANDARD LVCMOS33 } [get_ports {i_dato[2]}]
-set_property -dict { PACKAGE_PIN W17   IOSTANDARD LVCMOS33 } [get_ports {i_dato[3]}]
-set_property -dict { PACKAGE_PIN W15   IOSTANDARD LVCMOS33 } [get_ports {i_dato[4]}]
-set_property -dict { PACKAGE_PIN V15   IOSTANDARD LVCMOS33 } [get_ports {i_dato[5]}]
+###########################set_property -dict { PACKAGE_PIN V17   IOSTANDARD LVCMOS33 } [get_ports {i_dato[0]}]
+###########################set_property -dict { PACKAGE_PIN V16   IOSTANDARD LVCMOS33 } [get_ports {i_dato[1]}]
+###########################set_property -dict { PACKAGE_PIN W16   IOSTANDARD LVCMOS33 } [get_ports {i_dato[2]}]
+###########################set_property -dict { PACKAGE_PIN W17   IOSTANDARD LVCMOS33 } [get_ports {i_dato[3]}]
+###########################set_property -dict { PACKAGE_PIN W15   IOSTANDARD LVCMOS33 } [get_ports {i_dato[4]}]
+###########################set_property -dict { PACKAGE_PIN V15   IOSTANDARD LVCMOS33 } [get_ports {i_dato[5]}]
 #set_property -dict { PACKAGE_PIN W14   IOSTANDARD LVCMOS33 } [get_ports {sw[6]}]
 #set_property -dict { PACKAGE_PIN W13   IOSTANDARD LVCMOS33 } [get_ports {sw[ 7]}]
-set_property -dict { PACKAGE_PIN U1    IOSTANDARD LVCMOS33 } [get_ports {i_sw[0]}]
-set_property -dict { PACKAGE_PIN T1    IOSTANDARD LVCMOS33 } [get_ports {i_sw[1]}]
+#######################set_property -dict { PACKAGE_PIN U1    IOSTANDARD LVCMOS33 } [get_ports {i_sw[0]}]
+#######################set_property -dict { PACKAGE_PIN T1    IOSTANDARD LVCMOS33 } [get_ports {i_sw[1]}]
 set_property -dict { PACKAGE_PIN R2    IOSTANDARD LVCMOS33 } [get_ports {i_rst_n}]
 #set_property -dict { PACKAGE_PIN R3    IOSTANDARD LVCMOS33 } [get_ports {i_operandSwitches[3]}]
 #set_property -dict { PACKAGE_PIN W2    IOSTANDARD LVCMOS33 } [get_ports {i_operandSwitches[4]}]
@@ -50,10 +50,10 @@ set_property -dict { PACKAGE_PIN R2    IOSTANDARD LVCMOS33 } [get_ports {i_rst_n
 #set_property -dict { PACKAGE_PIN U15   IOSTANDARD LVCMOS33 } [get_ports {led[5]}]
 #set_property -dict { PACKAGE_PIN U14   IOSTANDARD LVCMOS33 } [get_ports {led[6]}]
 #set_property -dict { PACKAGE_PIN V14   IOSTANDARD LVCMOS33 } [get_ports {led[7]}]
-set_property -dict { PACKAGE_PIN U16   IOSTANDARD LVCMOS33 } [get_ports {o_leds[0]}]
-set_property -dict { PACKAGE_PIN E19   IOSTANDARD LVCMOS33 } [get_ports {o_leds[1]}]
-set_property -dict { PACKAGE_PIN U19    IOSTANDARD LVCMOS33 } [get_ports {o_leds[2]}]
-set_property -dict { PACKAGE_PIN V19    IOSTANDARD LVCMOS33 } [get_ports {o_leds[3]}]
+#########################3set_property -dict { PACKAGE_PIN U16   IOSTANDARD LVCMOS33 } [get_ports {o_leds[0]}]
+#########################3set_property -dict { PACKAGE_PIN E19   IOSTANDARD LVCMOS33 } [get_ports {o_leds[1]}]
+#########################3set_property -dict { PACKAGE_PIN U19    IOSTANDARD LVCMOS33 } [get_ports {o_leds[2]}]
+#########################3set_property -dict { PACKAGE_PIN V19    IOSTANDARD LVCMOS33 } [get_ports {o_leds[3]}]
 #set_property -dict { PACKAGE_PIN P3    IOSTANDARD LVCMOS33 } [get_ports {o_resultLeds[4]}]
 #set_property -dict { PACKAGE_PIN N3    IOSTANDARD LVCMOS33 } [get_ports {o_resultLeds[5]}]
 #set_property -dict { PACKAGE_PIN P1    IOSTANDARD LVCMOS33 } [get_ports {o_resultLeds[6]}]
@@ -78,7 +78,7 @@ set_property -dict { PACKAGE_PIN V19    IOSTANDARD LVCMOS33 } [get_ports {o_leds
 
 
 ##Buttons
-set_property -dict { PACKAGE_PIN W2   IOSTANDARD LVCMOS33 } [get_ports i_soft_reset]
+################set_property -dict { PACKAGE_PIN W2   IOSTANDARD LVCMOS33 } [get_ports i_soft_reset]
 ######set_property -dict { PACKAGE_PIN T18   IOSTANDARD LVCMOS33 } [get_ports i_operandBBttn]
 ######set_property -dict { PACKAGE_PIN W19   IOSTANDARD LVCMOS33 } [get_ports i_operationSBttn]
 ######set_property -dict { PACKAGE_PIN T17   IOSTANDARD LVCMOS33 } [get_ports i_resultBttn]
@@ -144,8 +144,8 @@ set_property -dict { PACKAGE_PIN W2   IOSTANDARD LVCMOS33 } [get_ports i_soft_re
 
 
 ##USB-RS232 Interface
-#set_property -dict { PACKAGE_PIN B18   IOSTANDARD LVCMOS33 } [get_ports RsRx]
-#set_property -dict { PACKAGE_PIN A18   IOSTANDARD LVCMOS33 } [get_ports RsTx]
+set_property -dict { PACKAGE_PIN B18   IOSTANDARD LVCMOS33 } [get_ports i_rx]
+set_property -dict { PACKAGE_PIN A18   IOSTANDARD LVCMOS33 } [get_ports o_tx]
 
 
 ##USB HID (PS/2)

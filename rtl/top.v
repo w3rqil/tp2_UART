@@ -3,15 +3,15 @@ module top
     NB_DATA = 8                             ,
     NB_STOP = 16                            ,
     NB_OP   = 6                             ,
-    NC_PER_TICK = 163                       ,      
-    NB_COUNTER = 8              
+    BAUD_RATE = 19200                       ,
+    CLK_FREQ = 50_000_000                   ,
+    OVERSAMPLING = 16      
 )(              
     input   wire    clk                     ,
-    input   wire    i_rst_n                 ,
+    input   wire    i_rst_n                 ,   
     input   wire    i_rx                    ,
-    output  wire    o_tx    
+   output    wire    o_tx
 );
-
 
     // baud rate generator
     wire tick;
@@ -32,8 +32,9 @@ module top
 
 
     baudrate_generator #(
-        .NC_PER_TICK(NC_PER_TICK    ),
-        .NB_COUNTER(NB_COUNTER      )
+        .BAUD_RATE  (BAUD_RATE      ),
+        .CLK_FREQ   (CLK_FREQ       ),
+        .OVERSAMPLING(OVERSAMPLING  )
     ) u_baudRateGen 
     (
         .clk        (clk            ),
@@ -101,5 +102,13 @@ module top
         .i_operation(op_i2ALU       ),
         .o_leds     (res_i2ALU      )  
     );
-
+//
+//    ila 
+//    u_ila(
+//        .clk_0(clk),
+//        .probe0_0(i_rx)                                                                   ,
+//        .probe1_0(o_tx)                                                                   ,
+//        .probe2_0(data_RX2i)                                                                          ,
+//        .probe3_0(data_i2TX)                                                                      
+//    );
 endmodule

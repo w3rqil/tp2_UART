@@ -14,9 +14,9 @@ ser = serial.Serial(
 )
 
 # ALU commands
-ALU_DATA_A_OP = bytes([0b001000])
-ALU_DATA_B_OP = bytes([0b010000])
-ALU_OPERATOR_OP = bytes([0b100000])
+ALU_DATA_A_OP = bytes([0b00001000])
+ALU_DATA_B_OP = bytes([0b00010000])
+ALU_OPERATOR_OP = bytes([0b00100000])
 
 # ALU operations
 ADD_OP = bytes([0b00100000])
@@ -28,37 +28,49 @@ SRA_OP = bytes([0b00000011])
 SRL_OP = bytes([0b00000010])
 NOR_OP = bytes([0b00100111])
 
+# Error Codes
+ALU_OPERATOR_ERROR = bytes([0xa1])
+INVALID_OPCODE = bytes([0xff])
+
 random.seed(0)
 
-# Function to send data to ALU
-def send_data_to_alu(operator, a_value, b_value):
-    ser.write(ALU_OPERATOR_OP)
-    ser.write(operator)
+# Function to send data to ALU and get the result
+def get_value_alu_test(operator, a_value, b_value):
+    
+    
+    # Send first operand (A)
+    time.sleep(0.1)
     ser.write(ALU_DATA_A_OP)
     ser.write(bytes([a_value]))
+    # time.sleep(0.1)
+    
+    # Send second operand (B)
     ser.write(ALU_DATA_B_OP)
+    # time.sleep(0.1)
     ser.write(bytes([b_value]))
+    # time.sleep(0.1)
+    
+    # Set operator
+    ser.write(ALU_OPERATOR_OP)
+    # time.sleep(0.1)
+    ser.write(operator)
+    # time.sleep(0.1)
 
-# Infinite loop to continuously get results from ALU
-try:
-    while True:
-        operator = random.choice([ADD_OP, SUB_OP, AND_OP, OR_OP, XOR_OP, SRA_OP, SRL_OP, NOR_OP])
-        a_value = random.randint(0, 255)
-        b_value = random.randint(0, 255)
+    # Request result
+    # ser.write(GET_RESULT_OP)
+    time.sleep(0.1)
+    
+    # Receive result
+    recv = ser.read(1)
+    return recv
 
-        send_data_to_alu(operator, a_value, b_value)
-        
-        # Receive result directly from ALU
-        recv = ser.read(1)  # Read the result sent by the ALU
-        print(f'ALU Operation Result: {recv.hex()} (A: {a_value}, B: {b_value})')
-        
-        time.sleep(0.5)  # Adjust the delay as necessary
+# Test all operations
+def test_all_operations():
 
-except KeyboardInterrupt:
-    print("Process interrupted by user.")
+    val = get_value_alu_test(ADD_OP, 0b00000001, 0b00000001)
+    print(f"A_value: 0b00000001, B_value: 0b00000001, Operator: {ADD_OP}, Result: {val}")
+    
+# Run all tests
+test_all_operations()
 
-finally:
-    # Ensure the serial connection is closed when the script exits
-    if ser.is_open:
-        ser.close()
-    print("Serial connection closed.")
+ser.close()

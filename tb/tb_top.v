@@ -4,8 +4,6 @@ module tb_top;
     localparam NB_DATA = 8;
     localparam NB_STOP = 16;
     localparam NB_OP = 6;
-    localparam NC_PER_TICK = 163;
-    localparam NB_COUNTER = 8;
     localparam CLK_PERIOD = 20; // Periodo de reloj en nanosegundos
 
     // Señales de entrada/salida
@@ -17,8 +15,9 @@ module tb_top;
 
     // Instantiate the baudrate generator
     baudrate_generator #(
-        .NC_PER_TICK(163),
-        .NB_COUNTER(8)
+        .BAUD_RATE(19200),
+        .CLK_FREQ(50_000_000),
+        .OVERSAMPLING(16)
     ) uut_baudrate_generator (
         .clk(clk),
         .i_rst_n(i_rst_n),
@@ -30,8 +29,9 @@ module tb_top;
         .NB_DATA(NB_DATA),
         .NB_STOP(NB_STOP),
         .NB_OP(NB_OP),
-        .NC_PER_TICK(NC_PER_TICK),
-        .NB_COUNTER(NB_COUNTER)
+        .BAUD_RATE(19200),
+        .CLK_FREQ(50_000_000),
+        .OVERSAMPLING(16)
     ) uut (
         .clk(clk),
         .i_rst_n(i_rst_n),
@@ -40,7 +40,7 @@ module tb_top;
     );
 
     // Generación del clock
-    always #(CLK_PERIOD / 2) clk = ~clk;
+    always #5 clk = ~clk;
 
     // Tarea para enviar datos a la interfaz UART (simulando recepción)
     task uart_send(input [NB_DATA-1:0] data);
@@ -69,11 +69,11 @@ module tb_top;
         
         // Enviar Dato A (tipo y valor)
         uart_send(6'b001000); // Tipo de dato DATOA
-        uart_send(8'h12);     // Valor de DATOA = 0x12 (18 en decimal)
+        uart_send(8'h01);     // Valor de DATOA = 0x12 (18 en decimal)
 
         // Enviar Dato B (tipo y valor)
         uart_send(6'b010000); // Tipo de dato DATOB
-        uart_send(8'h34);     // Valor de DATOB = 0x34 (52 en decimal)
+        uart_send(8'h01);     // Valor de DATOB = 0x34 (52 en decimal)
 
         // Enviar Operación (tipo y valor)
         uart_send(6'b100000); // Tipo de dato OP
