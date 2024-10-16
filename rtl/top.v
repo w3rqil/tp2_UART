@@ -63,52 +63,52 @@ module top
         .clk        (clk            ),
         .i_rst_n    (i_rst_n        ),
         .i_tick     (tick           ),
-        .i_start_tx (txStart        ),
-        .i_data     (data_i2TX      ),
+        .i_start_tx (rxDone         ),
+        .i_data     (data_RX2i      ),
         .o_txdone   (txDone         ),
         .o_data     (o_tx           ) //???????????????????????????????????????
 
     );
 
-    uart_interface #(
-        .NB_DATA    (NB_DATA        ),
-        .NB_STOP    (NB_STOP        ),
-        .NB_OP      (NB_OP          )
-    ) u_interface 
-    (
-        .clk        (clk            ),
-        .i_rx       (data_RX2i      ),
-        .i_rxDone   (rxDone         ),
-        .i_txDone   (txDone         ),
-        .i_rst_n    (i_rst_n        ),
-        .o_tx_start (txStart        ),
-        .o_data     (data_i2TX      ),
-
-        .o_operation(op_i2ALU       ),
-        .o_datoB    (datoB_i2ALU    ),
-        .o_datoA    (datoA_i2ALU    ),
-        .o_valid    (valid_i2ALU    ),
-        .i_result   (res_i2ALU      )
-
-    );
-
-    alu #(
-        .NB_DATA(NB_DATA            ),
-        .NB_OP  (NB_OP              )
-    ) u_ALU (
-        .i_valid    (valid_i2ALU    ),
-        .i_datoA    (datoA_i2ALU    ),
-        .i_datoB    (datoB_i2ALU    ),
-        .i_operation(op_i2ALU       ),
-        .o_leds     (res_i2ALU      )  
-    );
+//    uart_interface #(
+//        .NB_DATA    (NB_DATA        ),
+//        .NB_STOP    (NB_STOP        ),
+//        .NB_OP      (NB_OP          )
+//    ) u_interface 
+//    (
+//        .clk        (clk            ),
+//        .i_rx       (data_RX2i      ),
+//        .i_rxDone   (rxDone         ),
+//        .i_txDone   (txDone         ),
+//        .i_rst_n    (i_rst_n        ),
+//        .o_tx_start (txStart        ),
+//        .o_data     (data_i2TX      ),
 //
-//    ila 
-//    u_ila(
-//        .clk_0(clk),
-//        .probe0_0(i_rx)                                                                   ,
-//        .probe1_0(o_tx)                                                                   ,
-//        .probe2_0(data_RX2i)                                                                          ,
-//        .probe3_0(data_i2TX)                                                                      
+//        .o_operation(op_i2ALU       ),
+//        .o_datoB    (datoB_i2ALU    ),
+//        .o_datoA    (datoA_i2ALU    ),
+//        .o_valid    (valid_i2ALU    ),
+//        .i_result   (res_i2ALU      )
+//
 //    );
+//
+//    alu #(
+//        .NB_DATA(NB_DATA            ),
+//        .NB_OP  (NB_OP              )
+//    ) u_ALU (
+//        .i_valid    (valid_i2ALU    ),
+//        .i_datoA    (datoA_i2ALU    ),
+//        .i_datoB    (datoB_i2ALU    ),
+//        .i_operation(op_i2ALU       ),
+//        .o_leds     (res_i2ALU      )  
+//    );
+//
+    ila 
+    u_ila(
+        .clk_0(clk),
+        .probe0_0(i_rx)                                                                   ,
+        .probe1_0(o_tx)                                                                   ,
+        .probe2_0(data_RX2i)                                                                          ,
+        .probe3_0(data_i2TX)                                                                      
+    );
 endmodule
