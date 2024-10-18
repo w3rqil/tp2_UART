@@ -5,7 +5,9 @@ module tb_uart_rx;
     // Parameters
     localparam NB_DATA = 8;
     localparam NB_STOP = 16;
-
+    localparam BAUD_RATE  = 19200;
+    localparam CLK_FREQ   = 50_000_000;
+    localparam OVERSAMPLING = 16;
     // Signals
     reg clk;
     reg i_rst_n;
@@ -16,8 +18,9 @@ module tb_uart_rx;
 
     // Instantiate the baudrate generator
     baudrate_generator #(
-        .NC_PER_TICK(163),
-        .NB_COUNTER(8)
+        .BAUD_RATE(BAUD_RATE),
+        .CLK_FREQ(CLK_FREQ),
+        .OVERSAMPLING(OVERSAMPLING)
     ) uut_baudrate_generator (
         .clk(clk),
         .i_rst_n(i_rst_n),
@@ -43,11 +46,7 @@ module tb_uart_rx;
         forever #5 clk = ~clk; // 100MHz clock
     end
 
-    // // Monitor signals for debugging
-    // initial begin
-    //     $monitor("Time: %0t | i_data: %b | o_tick: %b | o_data: %b | o_rxdone: %b", 
-    //               $time, i_data, o_tick, o_data, o_rxdone);
-    // end
+
 
     // Test sequence
     initial begin
