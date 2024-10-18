@@ -1,36 +1,26 @@
 module top 
-#(
-    NB_DATA = 8                             ,
-    NB_STOP = 16                            ,
-    NB_OP   = 6                             ,
-    BAUD_RATE = 19200                       ,
-    CLK_FREQ = 50_000_000                   ,
-    OVERSAMPLING = 16      
-)(              
+(              
     input   wire    clk                     ,
     input   wire    i_rst_n                 ,   
     input   wire    i_rx                    ,
    output    wire    o_tx
 );
-
+    localparam  NB_DATA = 8                   ;
+    localparam  NB_STOP = 16                  ;
+    localparam  NB_OP   = 6                   ;
+    localparam  BAUD_RATE = 19200             ;
+    localparam  CLK_FREQ = 50_000_000         ;
+    localparam  OVERSAMPLING = 16             ;
     // baud rate generator
     wire tick;
-
-    // interface2ALU
-    wire                    valid_i2ALU     ;
-    wire [NB_DATA - 1 : 0]  datoA_i2ALU     ;
-    wire [NB_DATA - 1 : 0]  datoB_i2ALU     ;
-    wire [NB_OP   - 1 : 0]  op_i2ALU        ;
-    wire [NB_DATA - 1 : 0]  res_i2ALU       ;
-
     // interface2UART
     wire                    rxDone          ;
     wire                    txDone          ;
-    wire                    txStart         ;
+//   wire                    txStart         ;
     wire [NB_DATA - 1 : 0]  data_RX2i       ;
-    wire [NB_DATA - 1 : 0]  data_i2TX       ;
+//    wire [NB_DATA - 1 : 0]  data_i2TX       ;
 
-
+    wire  tx;
     baudrate_generator #(
         .BAUD_RATE  (BAUD_RATE      ),
         .CLK_FREQ   (CLK_FREQ       ),
@@ -50,7 +40,7 @@ module top
         .clk        (clk            ),
         .i_rst_n    (i_rst_n        ),
         .i_tick     (tick           ),
-        .i_data     (i_rx           ), //???????????????????????????????????????
+        .i_data     (i_rx             ), //???????????????????????????????????????
         .o_data     (data_RX2i      ),
         .o_rxdone   (rxDone         )
     );
@@ -66,49 +56,9 @@ module top
         .i_start_tx (rxDone         ),
         .i_data     (data_RX2i      ),
         .o_txdone   (txDone         ),
-        .o_data     (o_tx           ) //???????????????????????????????????????
+        .o_data     (tx           ) //???????????????????????????????????????
 
     );
+    assign o_tx = tx;
 
-//    uart_interface #(
-//        .NB_DATA    (NB_DATA        ),
-//        .NB_STOP    (NB_STOP        ),
-//        .NB_OP      (NB_OP          )
-//    ) u_interface 
-//    (
-//        .clk        (clk            ),
-//        .i_rx       (data_RX2i      ),
-//        .i_rxDone   (rxDone         ),
-//        .i_txDone   (txDone         ),
-//        .i_rst_n    (i_rst_n        ),
-//        .o_tx_start (txStart        ),
-//        .o_data     (data_i2TX      ),
-//
-//        .o_operation(op_i2ALU       ),
-//        .o_datoB    (datoB_i2ALU    ),
-//        .o_datoA    (datoA_i2ALU    ),
-//        .o_valid    (valid_i2ALU    ),
-//        .i_result   (res_i2ALU      )
-//
-//    );
-//
-//    alu #(
-//        .NB_DATA(NB_DATA            ),
-//        .NB_OP  (NB_OP              )
-//    ) u_ALU (
-//        .i_valid    (valid_i2ALU    ),
-//        .i_datoA    (datoA_i2ALU    ),
-//        .i_datoB    (datoB_i2ALU    ),
-//        .i_operation(op_i2ALU       ),
-//        .o_leds     (res_i2ALU      )  
-//    );
-//
-    ila 
-    u_ila(
-        .clk_0(clk),
-        .probe0_0(i_rx)                                                                   ,
-        .probe1_0(o_tx)                                                                   ,
-        .probe2_0(data_RX2i)                                                                          ,
-        .probe3_0(data_i2TX)                                                                      
-    );
 endmodule
