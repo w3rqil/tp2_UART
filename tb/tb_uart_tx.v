@@ -7,7 +7,9 @@ module uart_tx_tb;
   parameter NB_STOP = 16;
   parameter NC_PER_TICK = 163;
   parameter NB_COUNTER = 8;
-
+  localparam BAUD_RATE  = 19200;
+  localparam CLK_FREQ   = 50_000_000;
+  localparam OVERSAMPLING = 16;
   // Testbench signals
   reg clk;
   reg i_rst_n;
@@ -32,8 +34,9 @@ module uart_tx_tb;
   );
 
   baudrate_generator #(
-    .NC_PER_TICK(NC_PER_TICK),
-    .NB_COUNTER(NB_COUNTER)
+    .BAUD_RATE(BAUD_RATE),
+    .CLK_FREQ(CLK_FREQ),
+    .OVERSAMPLING(OVERSAMPLING)
   ) brg (
     .clk(clk),
     .i_rst_n(i_rst_n),

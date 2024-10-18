@@ -1,7 +1,7 @@
 module uart_tx
 #(
-    NB_DATA = 8,
-    NB_STOP = 16
+    parameter NB_DATA = 8,
+    parameter NB_STOP = 16
 )(
     input   wire                    clk                                  ,
     input   wire                    i_rst_n                              ,
@@ -14,13 +14,17 @@ module uart_tx
 );
 
 
-    reg [clogb2(NB_STOP-1)-1:0]   tick_counter                          ; //! tick counter
-    reg [clogb2(NB_STOP-1)-1:0]   next_tick_counter                     ; //! next value of tick_counter
+    reg [3:0]   tick_counter                                            ; //! tick counter
+    reg [3:0]   next_tick_counter                                       ; //! next value of tick_counter
+
     reg [3:0]                     state, next_state                     ;
-    reg [clogb2(NB_DATA-1)-1:0]   txBits                                ; //! txeived bits
-    reg [clogb2(NB_DATA-1)-1:0]   next_txBits                           ;
+
+    reg [2:0]   txBits                                                  ; //! txeived bits clogb2(NB_DATA-1)
+    reg [2:0]   next_txBits                                             ;
+    
     reg [NB_DATA-1:0]             txByte                                ; //! txeived frame
     reg [NB_DATA-1:0]             next_txByte                           ;
+    
     reg                           done_bit, next_done_bit               ;
     reg                           tx_reg, next_tx                       ;
     
@@ -40,7 +44,7 @@ module uart_tx
             txBits  <= 0                                                ;
             txByte  <= 0                                                ;
             done_bit <= 0                                               ;
-            tx_reg <= 0                                                 ;
+            tx_reg <= 1'b1                                              ;
         end else begin                  
             state <= next_state                                         ;
             tick_counter <= next_tick_counter                           ;
@@ -95,10 +99,10 @@ module uart_tx
                             next_state = STOP                           ;
 
                         end else begin
-                            next_txBits = txBits + 1        ;
+                            next_txBits = txBits + 1                    ;
                         end
                     end else begin
-                        next_tick_counter = tick_counter + 1 ;
+                        next_tick_counter = tick_counter + 1            ;
                     end
                 end
             end
@@ -108,7 +112,7 @@ module uart_tx
                 if(i_tick) begin
                     if(tick_counter == (NB_STOP-1)) begin
                         next_state = IDLE                               ;
-                        next_done_bit = 1                                    ;
+                        next_done_bit = 1'b1                            ;
                     end
                     else begin 
                         next_tick_counter = tick_counter + 1            ;
@@ -116,10 +120,8 @@ module uart_tx
                 end
             end
             default: begin
-                next_state          = IDLE                        ;
-                //next_txByte        = next_txByte                        ;
-                //next_txBits        = next_txBits                        ; 
-                //next_tick_counter   = next_tick_counter                 ;
+                next_state          = IDLE                              ;
+
             end
 
         endcase
@@ -128,12 +130,5 @@ module uart_tx
 
     assign o_data = tx_reg                                              ;
     assign o_txdone = done_bit                                          ;
-
-    function integer clogb2;
-    input integer value;
-    for (clogb2 = 0; value > 0; clogb2 = clogb2 + 1) begin
-        value = value >> 1;
-    end
-    endfunction
 
 endmodule
