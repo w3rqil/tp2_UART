@@ -92,7 +92,7 @@ module uart_interface
             IDLE: begin
                 if (i_rxDone) begin 
                     //next_done_counter = done_counter + 1                    ;
-                    type_reg = i_rx[NB_OP-1:0]                              ;
+                    type_reg = i_rx                                         ;
                     next_state = PARSE                                      ;
                     
                 end else begin                  
