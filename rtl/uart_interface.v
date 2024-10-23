@@ -1,16 +1,16 @@
 module uart_interface
 #(
-    NB_DATA  = 8                                                            , //! number bits data
-    NB_STOP  = 16                                                           , //! stops at 16 count                               
-    NB_OP    = 6                                                              //! number bits operation
+    NB_DATA  = 8                                                            , //! numero de bits de datos
+    NB_STOP  = 16                                                           , //! numero de bits de stop                               
+    NB_OP    = 6                                                              //! numero de bits de operacion
 )(
-    input       wire                            clk                         , //! project clock
-    input       wire signed [NB_DATA - 1 : 0]   i_rx                        , //! Inpur from UART_RX module
+    input       wire                            clk                         , //! Clock
+    input       wire signed [NB_DATA - 1 : 0]   i_rx                        , //! Input data para el modulo UART_RX
     input       wire                            i_rxDone                    , //! UART_RX done bit
     input       wire                            i_txDone                    , //! UART_TX done bit
-    input       wire                            i_rst_n                     , //! negative edge reset
+    input       wire                            i_rst_n                     , //! Reset de flanco de bajada
     output      wire                            o_tx_start                  ,
-    output      wire        [NB_DATA - 1 : 0]   o_data                      , //! Output result for UART_TX module
+    output      wire        [NB_DATA - 1 : 0]   o_data                      , //! Resultado de la ALU para ser enviado por UART_TX
 
 
 
@@ -19,42 +19,41 @@ module uart_interface
         ------- ALU I/O --------
         ------------------------
     */
-    output      wire        [NB_OP   - 1 : 0]   o_operation                ,
-    output      wire        [NB_DATA - 1 : 0]   o_datoB                    ,
-    output      wire        [NB_DATA - 1 : 0]   o_datoA                    ,
-    output      wire                            o_valid                    ,
-    input       wire        [NB_DATA - 1 : 0]   i_result                    
+    output      wire        [NB_OP   - 1 : 0]   o_operation                , //! Operacion de la ALU
+    output      wire        [NB_DATA - 1 : 0]   o_datoB                    , //! Dato B de la ALU
+    output      wire        [NB_DATA - 1 : 0]   o_datoA                    , //! Dato A de la ALU
+    output      wire                            o_valid                    , //! Valid de la ALU
+    input       wire        [NB_DATA - 1 : 0]   i_result                     //! Resultado de la ALU
 );
 
     // Estados de la máquina de estados
     localparam [2:0] 
-    IDLE    = 3'b001, 
-    PARSE   = 3'b010, 
-    STOP    = 3'b100;
+    IDLE    = 3'b001,                                                       //! Estado inicial
+    PARSE   = 3'b010,                                                       //! Estado de parseo
+    STOP    = 3'b100;                                                       //! Estado de parada
 
     // Tipos de registros para los datos
     localparam [5:0]
-    DATOA   = 6'b001000,
-    DATOB   = 6'b010000,
-    OP      = 6'b100000;
-    reg [2:0]               state                                           ;
-    reg [1:0]               done_counter                                    ;
+    DATOA   = 6'b001000,                                                     //! Tipo de dato A
+    DATOB   = 6'b010000,                                                     //! Tipo de dato B
+    OP      = 6'b100000;                                                     //! Tipo de operacion
+    reg [2:0]               state                                           ; //! Estado de la maquina de estados
+    reg [1:0]               done_counter                                    ; //! Contador de done
     // ALU
-    reg [NB_OP   - 1 : 0]   op                                              ;
-    reg [NB_DATA - 1 : 0]   datoB                                           ;
-    reg [NB_DATA - 1 : 0]   datoA                                           ;
-    reg                     valid                                           ;
-    reg                     next_valid                                      ;
-    reg  [NB_DATA - 1 : 0]  next_datoA                                      ;
-    reg  [NB_DATA - 1 : 0]  next_datoB                                      ;
-    reg  [NB_OP - 1 : 0  ]  next_op                                         ;
-    wire signed [NB_DATA - 1 : 0]  leds_reg                                 ;
+    reg [NB_OP   - 1 : 0]   op                                              ; //! Operacion de la interfaz
+    reg [NB_DATA - 1 : 0]   datoB                                           ; //! Dato B de la interfaz
+    reg [NB_DATA - 1 : 0]   datoA                                           ; //! Dato A de la interfaz
+    reg                     valid                                           ; //! Valid de la interfaz
+    reg                     next_valid                                      ; //! Siguiente Valid de la interfaz
+    reg  [NB_DATA - 1 : 0]  next_datoA                                      ; //! Siguiente Dato A de la interfaz
+    reg  [NB_DATA - 1 : 0]  next_datoB                                      ; //! Siguiente Dato B de la interfaz
+    reg  [NB_OP - 1 : 0  ]  next_op                                         ; //! Siguiente Operacion de la interfaz
+    wire signed [NB_DATA - 1 : 0]  leds_reg                                 ; //! Registro de salida de la ALU en leds
     // vars
-    reg                     tx_start, next_tx_start                         ;
-    reg  [2:0]              next_state                                      ;
-    reg  [1:0]              next_done_counter                               ;
-    reg  [NB_OP - 1 : 0]    type_reg                                        ;
-    reg  [NB_DATA - 1 : 0]  data_reg;
+    reg                     tx_start, next_tx_start                         ; //! Start de la transmision
+    reg  [2:0]              next_state                                      ; //! Siguiente estado
+    reg  [1:0]              next_done_counter                               ; //! Siguiente contador de done
+    reg  [NB_OP - 1 : 0]    type_reg                                        ; //! Registro de tipo de dato (op, datoA, datoB)  
 
 
     always @(posedge clk or negedge i_rst_n) begin

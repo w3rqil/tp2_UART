@@ -1,19 +1,19 @@
 module baudrate_generator
 #(
-    parameter BAUD_RATE = 19200,
-    parameter CLK_FREQ = 50_000_000,
-    parameter OVERSAMPLING = 16
+    parameter BAUD_RATE = 19200,                                        //! Velocidad de transmision
+    parameter CLK_FREQ = 50_000_000,                                    //! Frecuencia del reloj
+    parameter OVERSAMPLING = 16                                         //! Oversampling
    // parameter NB_COUNTER = 8
 
 )(
-    input   wire clk                                                    ,
-    input   wire i_rst_n                                                ,
+    input   wire clk                                                    , //! Reloj
+    input   wire i_rst_n                                                , //! Reset
     output  wire o_tick                                                   //! tick que se genera cada NC_PER_TICK
 
 );
-localparam NC_PER_TICK = CLK_FREQ / BAUD_RATE / OVERSAMPLING;
-localparam NB_COUNTER = clogb2(NC_PER_TICK - 1);
-reg [NB_COUNTER-1:0] counter                                            ;
+localparam NC_PER_TICK = CLK_FREQ / BAUD_RATE / OVERSAMPLING;           //! Numero de ciclos por tick
+localparam NB_COUNTER = clogb2(NC_PER_TICK - 1);                        //! Numero de bits del contador
+reg [NB_COUNTER-1:0] counter                                            ; //! Contador
 
 always @(posedge clk or negedge i_rst_n) begin
     if(!i_rst_n) begin 
