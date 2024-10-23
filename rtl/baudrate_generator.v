@@ -1,7 +1,7 @@
 module baudrate_generator
 #(
     parameter BAUD_RATE = 19200,
-    parameter CLK_FREQ = 50_000_000,
+    parameter CLK_FREQ = 100_000_000,
     parameter OVERSAMPLING = 16
    // parameter NB_COUNTER = 8
 
@@ -13,7 +13,7 @@ module baudrate_generator
 );
 localparam NC_PER_TICK = CLK_FREQ / BAUD_RATE / OVERSAMPLING        ;
 localparam NB_COUNTER = 8;
-reg [NB_COUNTER-1:0] counter                                            ;
+reg [NB_COUNTER:0] counter                                            ;
 
 always @(posedge clk or negedge i_rst_n) begin
     if(!i_rst_n) begin 

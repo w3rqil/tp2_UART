@@ -8,7 +8,7 @@ module alu
     input   wire                           i_valid                                              , //! valid para cambiar la salida
     input   wire    signed [NB_DATA-1:0]   i_datoA                                              , //! Dato de entrada
     input   wire    signed [NB_DATA-1:0]   i_datoB                                              , //! Dato de entrada
-    input   wire    [NB_OP - 1:0]   i_operation                                                 , //! Operación a realizar    
+    input   wire           [NB_OP - 1:0]   i_operation                                          , //! Operación a realizar    
     output  wire    signed [NB_DATA-1:0]   o_leds                                                 //! output  
 );
 
