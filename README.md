@@ -1,4 +1,4 @@
-![fcefyn](  /home/leonel/Desktop/Arqui/tp2_UART/img/fcefyn_logo.png)
+![fcefyn](  /img/fcefyn_logo.png)
 
 En este repositorio se desarrolla el trabajo práctico número 2 de la materia Arquitectura de Computadoras.
 Este proyecto fue realizado por los alumnos: 
@@ -10,7 +10,7 @@ Este proyecto fue realizado por los alumnos:
 # Consigna
 Realizar un Receptor y Transmisor Asíncrono Universal del siguiente tipo:
 
-![Receptor y transmisor](/home/leonel/Desktop/Arqui/tp2_UART/img/tp2.png)
+![Receptor y transmisor](/img/tp2.png)
 
 # Desarrollo
 
@@ -24,7 +24,7 @@ Para el desarrollo del trabajo práctico se reutilizo el modulo alu del primer t
 
 # jerarquia de Archivos
 
-![jerarquia](/home/leonel/Desktop/Arqui/tp2_UART/img/jerarquia.png)
+![jerarquia](/img/jerarquia.png)
 
 ## Module Baudrate Generator
 
@@ -35,7 +35,7 @@ A continuación un diagrama del módulo donde se pueden ver sus entradas y salid
 - **File**: baudrate_generator.v
 
 ### Diagram
-![Diagram](/home/leonel/Desktop/Arqui/tp2_UART/img/baudrate_generator.svg "Diagram")
+![Diagram](/img/baudrate_generator.svg "Diagram")
 ### Generics
 
 | Generic name | Type | Value      | Description              |
@@ -71,7 +71,7 @@ Esta iterfáz está diseñada para recibir datos desde el receptor uart (UART_RX
 En el único momento en el que se enviará un resultado hacia el uart_TX será después de que se reciba una operación. Es decir, el orden correcto de enviarle datos a la interfaz sería **dato_A** --> **dato_B** --> **operation**. \
 Aún así, se puede mandar otra operación y conservar los datos A y B previos.
 
-![interface](/home/leonel/Desktop/Arqui/tp2_UART/img/uart_interface.png)
+![interface](/img/uart_interface.png)
 
 # Python
 Para enviar y recibir los datos por uart se utilizó una simple [interfáz de python](uartInterface.py) donde se le configura el puerto y el baudrate utilizado (éste último debe ser coincidente con el del módulo baudrate_generator).\
@@ -92,9 +92,11 @@ def test_all_operations():
 ```
 Podemos ver que en la consola se imprimen los resultados correctos:
 
-![result](/home/leonel/Desktop/Arqui/tp2_UART/img/python_result.png)
+![result](/img/python_result.png)
+
+
 # Schematic
 
 A continuación el esquemático del proyecto final donde se pueden ver las conexiones entre módulos.
 
-![schematic](/home/leonel/Desktop/Arqui/tp2_UART/img/schematic.png)
+![schematic](/img/schematic.png)
